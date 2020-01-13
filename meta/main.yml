@@ -8,8 +8,15 @@ galaxy_info:
   min_ansible_version: 2.4
   platforms:
     - name: Debian
-      versions: all
-  galaxy_tags: []
+      versions:
+        - jessie
+        - stretch
+        - buster
+  galaxy_tags:
+    - sonarr
+    - media
+    - torrent
+    - series
 
 dependencies: []
 ...

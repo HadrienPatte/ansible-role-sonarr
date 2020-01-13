@@ -6,8 +6,12 @@ driver:
 lint:
   name: yamllint
 platforms:
-  - name: debian
-    image: debian
+  - name: jessie
+    image: debian:jessie
+  - name: stretch
+    image: debian:stretch
+  - name: buster
+    image: debian:buster
 provisioner:
   name: ansible
   lint:
