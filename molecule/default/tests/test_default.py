@@ -8,6 +8,17 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
 
 
+def test_group(host):
+    group = host.group('sonarr')
+    assert group.exists
+
+
+def test_user(host):
+    user = host.user('sonarr')
+    assert user.name == 'sonarr'
+    assert user.group == 'sonarr'
+
+
 @pytest.mark.parametrize('name', [
     ('apt-transport-https'),
     ('sonarr'),

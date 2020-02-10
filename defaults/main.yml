@@ -1,1 +1,4 @@
 ---
+sonarr_user: sonarr
+sonarr_group: sonarr
+...

@@ -10,7 +10,11 @@ None.
 
 ## Role Variables
 
-None.
+* `sonarr_user`: name of the system user that runs sonarr, defaults to `sonarr`
+* `sonarr_group`: group of the system user that runs sonarr. Any media files
+  created by Sonarr will be writeable by this group. It's advisable to keep the
+  group the same between download client, Sonarr and media centers. Defaults to
+  `sonarr`
 
 # Dependencies
 

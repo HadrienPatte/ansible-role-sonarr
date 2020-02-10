@@ -1,4 +1,18 @@
 ---
+- name: Create {{ sonarr_group }} group
+  group:
+    name: "{{ sonarr_group }}"
+    state: present
+
+- name: Create {{ sonarr_user }} user
+  user:
+    name: "{{ sonarr_user }}"
+    group: "{{ sonarr_group }}"
+    state: present
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+
 - name: Install apt-transport-https
   apt:
     name: apt-transport-https
@@ -31,6 +45,29 @@
   register: apt_result
   retries: 3
   until: apt_result is succeeded
+
+- name: configure Sonarr service
+  ini_file:
+    path: /lib/systemd/system/sonarr.service
+    section: Service
+    option: "{{ item.option }}"
+    state: present
+    value: "{{ item.value }}"
+  loop:
+    - option: User
+      value: "{{ sonarr_user }}"
+    - option: Group
+      value: "{{ sonarr_group }}"
+  notify: Restart Sonarr
+
+- name: Set correct ownership of Sonarr directory
+  file:
+    path: /var/lib/sonarr
+    state: directory
+    recurse: true
+    owner: "{{ sonarr_user }}"
+    group: "{{ sonarr_group }}"
+  notify: Restart Sonarr
 
 - name: Enable Sonarr
   systemd:

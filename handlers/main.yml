@@ -1,0 +1,7 @@
+---
+- name: Restart Sonarr
+  systemd:
+    name: sonarr
+    state: restarted
+    daemon_reload: true
+...
