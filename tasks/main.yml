@@ -21,21 +21,38 @@
   retries: 3
   until: apt_result is succeeded
 
-- name: Import Sonarr Team GPG key
+- name: Import Sonarr and Mono GPG keys
   apt_key:
     keyserver: keyserver.ubuntu.com
-    id: 2009837CBFFD68F45BC180471F4F90DE2A9B4BF8
+    id: "{{ item }}"
+    state: present
+  loop:
+    - 2009837CBFFD68F45BC180471F4F90DE2A9B4BF8  # Sonarr
+    - 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF  # Mono
+  register: apt_key_result
+  retries: 3
+  until: apt_key_result is succeeded
+
+- name: Import MediaInfo GPG Key
+  apt_key:
+    url: https://mediaarea.net/repo/deb/debian/pubkey.gpg
     state: present
   register: apt_key_result
   retries: 3
   until: apt_key_result is succeeded
 
-- name: Add Sonarr repository
+- name: Add Sonarr, Mono and MediaInfo repositories
   apt_repository:
-    repo: >
-      deb https://apt.sonarr.tv/{{ ansible_distribution | lower }}
-      {{ ansible_distribution_release }} main
+    repo: "{{ item }}"
     state: present
+  loop:
+    - "deb https://apt.sonarr.tv/{{ ansible_distribution | lower }} \
+      {{ ansible_distribution_release }} main"
+    - "deb https://download.mono-project.com/repo/\
+      {{ ansible_distribution | lower }} \
+      stable-{{ ansible_distribution_release }} main"
+    - "deb https://mediaarea.net/repo/deb/{{ ansible_distribution | lower }} \
+      {{ ansible_distribution_release }} main"
 
 - name: Install Sonarr
   apt:
