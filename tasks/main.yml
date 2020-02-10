@@ -1,1 +1,34 @@
 ---
+- name: Install apt-transport-https
+  apt:
+    name: apt-transport-https
+    state: present
+  register: apt_result
+  retries: 3
+  until: apt_result is succeeded
+
+- name: Import Sonarr Team GPG key
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: 2009837CBFFD68F45BC180471F4F90DE2A9B4BF8
+    state: present
+  register: apt_key_result
+  retries: 3
+  until: apt_key_result is succeeded
+
+- name: Add Sonarr repository
+  apt_repository:
+    repo: >
+      deb https://apt.sonarr.tv/{{ ansible_distribution | lower }}
+      {{ ansible_distribution_release }} main
+    state: present
+
+- name: Install Sonarr
+  apt:
+    update_cache: true
+    name: sonarr
+    state: present
+  register: apt_result
+  retries: 3
+  until: apt_result is succeeded
+...

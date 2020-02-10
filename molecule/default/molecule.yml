@@ -6,12 +6,14 @@ driver:
 lint:
   name: yamllint
 platforms:
-  - name: jessie
-    image: debian:jessie
-  - name: stretch
-    image: debian:stretch
-  - name: buster
-    image: debian:buster
+  - name: debian-buster
+    image: jrei/systemd-debian:10
+    privileged: true
+    command: /sbin/init
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    published_ports:
+      - "8989"
 provisioner:
   name: ansible
   lint:
