@@ -33,7 +33,15 @@
   retries: 3
   until: apt_key_result is succeeded
 
-- name: Add Sonarr and Mono repositories
+- name: Import MediaInfo GPG Key
+  apt_key:
+    url: https://mediaarea.net/repo/deb/debian/pubkey.gpg
+    state: present
+  register: apt_key_result
+  retries: 3
+  until: apt_key_result is succeeded
+
+- name: Add Sonarr, Mono and MediaInfo repositories
   apt_repository:
     repo: "{{ item }}"
     state: present
@@ -43,6 +51,8 @@
     - "deb https://download.mono-project.com/repo/\
       {{ ansible_distribution | lower }} \
       stable-{{ ansible_distribution_release }} main"
+    - "deb https://mediaarea.net/repo/deb/{{ ansible_distribution | lower }} \
+      {{ ansible_distribution_release }} main"
 
 - name: Install Sonarr
   apt:
