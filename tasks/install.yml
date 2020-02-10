@@ -1,0 +1,99 @@
+---
+- name: Create {{ sonarr_group }} group
+  group:
+    name: "{{ sonarr_group }}"
+    state: present
+
+- name: Create {{ sonarr_user }} user
+  user:
+    name: "{{ sonarr_user }}"
+    group: "{{ sonarr_group }}"
+    state: present
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+
+- name: Install apt-transport-https
+  apt:
+    name: apt-transport-https
+    state: present
+  register: apt_result
+  retries: 3
+  until: apt_result is succeeded
+
+- name: Import Sonarr and Mono GPG keys
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: "{{ item }}"
+    state: present
+  loop:
+    - 2009837CBFFD68F45BC180471F4F90DE2A9B4BF8  # Sonarr
+    - 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF  # Mono
+  register: apt_key_result
+  retries: 3
+  until: apt_key_result is succeeded
+
+- name: Import MediaInfo GPG Key
+  apt_key:
+    url: https://mediaarea.net/repo/deb/debian/pubkey.gpg
+    state: present
+  register: apt_key_result
+  retries: 3
+  until: apt_key_result is succeeded
+
+- name: Add Sonarr, Mono and MediaInfo repositories
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  loop:
+    - "deb https://apt.sonarr.tv/{{ ansible_distribution | lower }} \
+      {{ ansible_distribution_release }} main"
+    - "deb https://download.mono-project.com/repo/\
+      {{ ansible_distribution | lower }} \
+      stable-{{ ansible_distribution_release }} main"
+    - "deb https://mediaarea.net/repo/deb/{{ ansible_distribution | lower }} \
+      {{ ansible_distribution_release }} main"
+
+- name: Install Sonarr and {{ sonarr_HTTP_server }}
+  apt:
+    update_cache: true
+    name:
+      - sonarr
+      - "{{ sonarr_HTTP_server }}"
+    state: present
+  register: apt_result
+  retries: 3
+  until: apt_result is succeeded
+
+- name: Configure Sonarr service
+  ini_file:
+    path: /lib/systemd/system/sonarr.service
+    section: Service
+    option: "{{ item.option }}"
+    state: present
+    value: "{{ item.value }}"
+  loop:
+    - option: User
+      value: "{{ sonarr_user }}"
+    - option: Group
+      value: "{{ sonarr_group }}"
+  notify: Restart Sonarr
+
+- name: Set correct ownership of Sonarr directory
+  file:
+    path: /var/lib/sonarr
+    state: directory
+    recurse: true
+    owner: "{{ sonarr_user }}"
+    group: "{{ sonarr_group }}"
+  notify: Restart Sonarr
+
+- name: Enable Sonarr and {{ sonarr_HTTP_server }}
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - sonarr
+    - "{{ sonarr_HTTP_server }}"
+...

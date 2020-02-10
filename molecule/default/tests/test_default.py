@@ -22,6 +22,7 @@ def test_user(host):
 @pytest.mark.parametrize('name', [
     ('apt-transport-https'),
     ('sonarr'),
+    ('nginx'),
 ])
 def test_package_is_installed(host, name):
     package = host.package(name)
@@ -30,6 +31,7 @@ def test_package_is_installed(host, name):
 
 @pytest.mark.parametrize('name', [
     ('sonarr'),
+    ('nginx'),
 ])
 def test_service_is_running(host, name):
     service = host.service(name)
@@ -38,6 +40,7 @@ def test_service_is_running(host, name):
 
 @pytest.mark.parametrize('name', [
     ('sonarr'),
+    ('nginx'),
 ])
 def test_service_is_enabled(host, name):
     service = host.service(name)
@@ -46,6 +49,8 @@ def test_service_is_enabled(host, name):
 
 @pytest.mark.parametrize('port', [
     ('8989'),
+    ('80'),
+    ('443'),
 ])
 def test_socket(host, port):
     assert host.socket('tcp://0.0.0.0:' + port).is_listening
