@@ -1,4 +1,14 @@
 ---
 sonarr_user: sonarr
 sonarr_group: sonarr
+sonarr_HTTP_port: 8989
+sonarr_FQDN:
+  - sonarr.example.com
+sonarr_HTTP_server: nginx
+sonarr_certificate_path: /etc/ssl/private/{{ sonarr_FQDN | first }}
+sonarr_generate_self_signed_certificate: true
+sonarr_redirect_HTTPS: false
+sonarr_letsencrypt: false
+sonarr_letsencrypt_email: admin@{{ sonarr_FQDN | first }}
+sonarr_remove_default: false
 ...

@@ -13,6 +13,8 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     published_ports:
+      - "80"
+      - "443"
       - "8989"
 provisioner:
   name: ansible
