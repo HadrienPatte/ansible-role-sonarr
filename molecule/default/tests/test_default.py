@@ -21,6 +21,7 @@ def test_user(host):
 
 @pytest.mark.parametrize('name', [
     ('apt-transport-https'),
+    ('gnupg2'),
     ('sonarr'),
     ('nginx'),
 ])
